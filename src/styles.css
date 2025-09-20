@@ -1,0 +1,184 @@
+body {
+  display: flex;
+  flex-direction: column; /* apila verticalmente */
+  align-items: center;     /* centra horizontalmente */
+  background: #020202;
+  margin: 0;
+  min-height: 100vh;
+}
+#reiniciar {
+  padding: 10px 20px;
+  margin: 20px;
+  font-size: 16px;
+  margin-top: 10px;
+
+}
+
+
+.titulo {
+  color: white;
+  font-size: 32px;
+  text-align: center;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(8, 65px); /* 8 columnas */
+  grid-template-rows: repeat(8, 65px);    /* 8 filas */
+  gap: 2px;
+
+
+  border: 2px solid rgb(206, 206, 206);     /* Borde blanco */
+  padding: 8px;                /* Espacio interno entre borde y celdas */
+  border-radius: 8px;          /* Bordes redondeados opcionales */
+  background-color: #262626;   /* Fondo detrás de las celdas */
+  
+}
+
+.celda {
+  width: 65px;
+  height: 65px;
+  background-size: cover;     /* la imagen ocupa todo el espacio */
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 4px;
+}
+
+.celda {
+  position: relative; /* necesario para posicionar el pseudo-elemento */
+}
+
+/* 2. Define el estado inicial del borde (invisible) */
+.celda::after {
+  content: "";
+  position: absolute;
+  top: 0.1px;
+  left: 0.1px;
+  right: 0.1px;
+  bottom: 0.1px;
+  
+  border-radius: 4px;
+  pointer-events: none; /* Muy buena práctica para que no interfiera con el mouse */
+  
+  /* Estado inicial: borde transparente */
+  border: 1.4px solid transparent; 
+  background-color: transparent;
+  
+  /* Aquí definimos la transición para que se aplique en ambos sentidos */
+  transition: border-color 0.5s ease; /* Reduje el tiempo para un efecto más ágil */
+}
+
+/*EFECTO: Se enciende tenuemente un borde gris para cada celda*/
+.celda:hover::after {
+  border-color: rgb(124, 124, 124); /* Al hacer hover, el color cambia y la transición se activa */
+}
+
+.celda-oculta::after{
+ content: "";
+  position: absolute;
+  top: 0.3px;
+  left: 0.3;
+  right: 0.3;
+  bottom: 0.3;
+  background-color: transparent;
+  border-radius: 4px;
+  transition: background-color 0.5s ease;
+  transition: border-color 0.5s ease;
+  pointer-events: none;
+}
+.celda-oculta:hover::after{
+    background-color: rgba(185, 185, 185, 0.4); /* gris claro con transparencia */
+    border-color: white;
+}
+
+
+
+/* Estados */
+.celda-mina {
+  background-image: url("../assets/img/BOMBA.png");
+
+}
+
+.celda-1 {
+  background-image: url("../assets/img/UNO.png");
+  filter: brightness(1.2); /* 120% de brillo */
+}
+
+.celda-2 {
+  background-image: url("../assets/img/DOS.png");
+  filter: brightness(1.6); /* 120% de brillo */
+}
+
+.celda-3 {
+  background-image: url("../assets/img/TRES.png");
+}
+
+.celda-4 {
+  background-image: url("../assets/img/CUATRO.png");
+}
+
+.celda-oculta {
+  background-image: url("../assets/img/CeldaGris.png");
+  position: relative;
+}
+.celda-vacia {
+    background-color: rgb(19, 19, 19);
+}
+
+.celda-bandera{
+    background-image: url("../assets/img/BANDERA.png");
+}
+
+.celda-bandera::after{
+ content: "";
+  position: absolute;
+  top: 0.3px;
+  left: 0.3;
+  right: 0.3;
+  bottom: 0.3;
+  background-color: transparent;
+  border-radius: 4px;
+  transition: background-color 0.5s ease;
+  transition: border-color 0.5s ease;
+  pointer-events: none;
+}
+.celda-bandera:hover::after{
+    background-color: rgba(185, 185, 185, 0.4); /* gris claro con transparencia */
+    border-color: white;
+}
+
+@keyframes pulsoRojo {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0px rgba(255, 0, 0, 0.6);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+  }
+  50% {
+    transform: scale(1.1) rotate(-1deg);
+    box-shadow: 0 0 25px rgba(255, 0, 0, 1);
+  }
+  75% {
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0px rgba(255, 0, 0, 0.6);
+    opacity: 0.8;
+  }
+}
+
+
+.celda-pulso {
+  animation: pulsoRojo 0.4s ease;
+  z-index: 10;
+  position: relative;
+}
