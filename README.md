@@ -1,1 +1,1 @@
-# Buscaminas-versi-n-Ne-n
+# Buscaminas-version neon
