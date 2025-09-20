@@ -8,12 +8,18 @@ body {
 }
 #reiniciar {
   padding: 10px 20px;
-  margin: 20px;
+  margin: 10px;
   font-size: 16px;
-  margin-top: 10px;
+  padding-bottom: 10px;
 
 }
 
+#tiempo {
+    color: white;
+    text-align: center;
+    transform: scale(1.5);
+    margin-bottom: 20px;
+}
 
 .titulo {
   color: white;

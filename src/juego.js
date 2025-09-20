@@ -1,4 +1,7 @@
 //Este código contiene el modelo lógico y el renderizado del juego
+let segundos = 0;
+let minutos = 0;
+let intervalo;
 //Definición de constantes básicas
 //Dimensión del tablero
 let juegoTerminado = false;
@@ -15,6 +18,7 @@ console.log(tablero);
 window.addEventListener("DOMContentLoaded", () => {
 pintar(tablero);
 });
+
 
 document.querySelector("#reiniciar").addEventListener("click", reiniciarJuego);
 
@@ -36,10 +40,11 @@ function pintar(tablero) {
         //AGREGO UN PUNTO OYENTE PARA QUE EL DIV i,j TENGA LA CAPACIDAD DE PERCIBIR EVENTOS.
         //EVENTOS CLICK IZQUIERDO:
         celda.addEventListener("click", (event_IZQ) => {
-            if(juegoTerminado == true){
-                alert("Juego terminado, perdiste pa.");
-                return;
+            if (juegoTerminado) return; // Evita que se siga jugando después de ganar o perder
+            if(minutos == 0 && segundos == 0){
+                iniciarTimer();
             }
+            
             if (celda.classList.contains("celda-bandera")) {
                 console.log("Esta celda está marcada con bandera. No se puede revelar.");
                 return; // Evita que se revele
@@ -69,9 +74,12 @@ function pintar(tablero) {
 
             //Antes del renderizado: Verificación de partida ganada.
             if (contador == ORDENC * ORDENC - minas) {
+                detenerTimer();
+                juegoTerminado = true;
                 setTimeout(() => {
                     alert("Ganaste");
                 }, 50);
+                return;
             }
         });
 
@@ -121,13 +129,50 @@ function mapeoDOM(celdas, tablero) {
       }
     }
   }
+  if (juegoTerminado == true) {
+    //terminar timer:
+    detenerTimer();
+    setTimeout(() => {
+      alert("Has perdido ;(");
+    }, 50);
+    return;
+  }
 }
 
 function reiniciarJuego() {
   juegoTerminado = false;
   contador = 0;
   tablero = generarTablero(ORDENC,ORDENC,minas); // lógica que crea el tablero vacío o con minas
+  reiniciarTimer();
   pintar(tablero); // repinta el DOM desde cero
+  
   //document.querySelector(".mensaje").textContent = ""; // limpia mensajes, en caso de existir etiquetas html
 }
 
+
+
+function iniciarTimer() {
+  if (intervalo !== null) return;
+  intervalo = setInterval(() => {
+    segundos++;
+    if (segundos === 60) {
+      minutos++;
+      segundos = 0;
+    }
+    document.getElementById("tiempo").textContent =
+      `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+  }, 1000);
+}
+
+
+function detenerTimer() {
+  clearInterval(intervalo);
+}
+
+function reiniciarTimer() {
+  detenerTimer();
+  segundos = 0;
+  minutos = 0;
+  document.getElementById("tiempo").textContent = "00:00";
+  intervalo = null; // 
+}
