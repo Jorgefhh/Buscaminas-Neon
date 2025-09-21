@@ -6,28 +6,69 @@ body {
   margin: 0;
   min-height: 100vh;
 }
-#reiniciar {
-  padding: 10px 20px;
-  margin: 10px;
-  font-size: 16px;
-  padding-bottom: 10px;
 
+.barra-superior {
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  align-items: center;     /* alinea verticalmente */
+  gap: 60px;               /* espacio entre los elementos */
+  margin: 5px 0;
+}
+
+#reiniciar {
+  position: relative;
+  z-index: 0;
+  color: aliceblue;
+  background-color: #262626;
+  font-size: 20px;
+  padding: 16px 32px;
+  margin: 10px;
+  border-radius: 4px;
+  appearance: none;
+  border: none;
+  outline: none;
+}
+
+#reiniciar::after{
+  content: "";
+  position: absolute;
+  top: 0.1px;
+  left: 0.1px;
+  right: 0.1px;
+  bottom: 0.1px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition: background-color 0.5s ease;
+  transition: border-color 0s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+#reiniciar:hover::after{
+    background-color: rgba(95, 95, 95, 0.4); /* gris claro con transparencia */    
+}
+
+#reiniciar.activado::after{
+    border-color: white;
 }
 
 #tiempo {
+    border: 1px solid #ffffff;
+    font-size: 16px;
     color: white;
-    text-align: center;
     transform: scale(1.5);
-    margin-bottom: 20px;
+    padding: 10px 26px;
+    border-radius: 4px;
+    border-color: aliceblue;
 }
 
 .titulo {
   color: white;
-  font-size: 32px;
+  font-size: 24px;
   text-align: center;
   width: 100%;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 15px;
+  margin-bottom: 8px;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -35,9 +76,6 @@ body {
   display: grid;
   grid-template-columns: repeat(8, 65px); /* 8 columnas */
   grid-template-rows: repeat(8, 65px);    /* 8 filas */
-  gap: 2px;
-
-
   border: 2px solid rgb(206, 206, 206);     /* Borde blanco */
   padding: 8px;                /* Espacio interno entre borde y celdas */
   border-radius: 8px;          /* Bordes redondeados opcionales */
@@ -46,17 +84,22 @@ body {
 }
 
 .celda {
-  width: 65px;
-  height: 65px;
+  width: 64.4px;
+  height: 64.4px;
   background-size: cover;     /* la imagen ocupa todo el espacio */
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 4px;
+  border-radius: 1px;
+  border: 0.1px solid #262626; /* simula el gap visual */
+
+  transform: scale(0.988);
 }
 
 .celda {
   position: relative; /* necesario para posicionar el pseudo-elemento */
 }
+
+
 
 /* 2. Define el estado inicial del borde (invisible) */
 .celda::after {
@@ -66,7 +109,6 @@ body {
   left: 0.1px;
   right: 0.1px;
   bottom: 0.1px;
-  
   border-radius: 4px;
   pointer-events: none; /* Muy buena práctica para que no interfiera con el mouse */
   
@@ -103,6 +145,8 @@ body {
 
 
 
+
+
 /* Estados */
 .celda-mina {
   background-image: url("../assets/img/BOMBA.png");
@@ -116,7 +160,7 @@ body {
 
 .celda-2 {
   background-image: url("../assets/img/DOS.png");
-  filter: brightness(1.6); /* 120% de brillo */
+  filter: brightness(1.2); /* 120% de brillo */
 }
 
 .celda-3 {
@@ -127,6 +171,10 @@ body {
   background-image: url("../assets/img/CUATRO.png");
 }
 
+.celda-5 {
+  background-image: url("../assets/img/CINCO.png");
+}
+
 .celda-oculta {
   background-image: url("../assets/img/CeldaGris.png");
   position: relative;
@@ -135,8 +183,25 @@ body {
     background-color: rgb(19, 19, 19);
 }
 
+.celda-bandera-error {
+    background-image: url("../assets/img/BANDERA.png");
+    top: 0.3px;
+    left: 0.3;
+    right: 0.3;
+    bottom: 0.3;
+    transform: scale(0.98);
+    background-color: rgb(237, 127, 127);
+    border-radius: 4px;
+    
+    background-blend-mode: multiply;
+    background-size: cover;
+    background-position: center;
+}
+
+
 .celda-bandera{
     background-image: url("../assets/img/BANDERA.png");
+
 }
 
 .celda-bandera::after{

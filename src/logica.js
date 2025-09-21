@@ -67,7 +67,6 @@ function setBoard(tablero, fila, col) {
         }
     }
     juegoTerminado = true;
-    //alert("Perdiste pa");
     return;
   }
   if (tablero[fila][col] != "V") return; // ya revelada, corto
@@ -144,7 +143,7 @@ function resolveAdy(tablero, fila, col,celdas){
     [1, 0],
     [1, 1], // fila de abajo
   ];
-  let cont = 0;
+  let totalFlag = 0, flagsValid = 0;
   direcciones.forEach(([df, dc]) => {  //Recorro todas las diagonales:
     let nueva_fila = fila + df;
     let nueva_col = col + dc;
@@ -152,15 +151,31 @@ function resolveAdy(tablero, fila, col,celdas){
     if (nueva_fila >= 0 && nueva_fila < ORDENF && nueva_col >= 0 && nueva_col < ORDENF) {
       let idx = ORDENC * nueva_fila + nueva_col;
       //Validación de bordes:
-      if (tablero[nueva_fila][nueva_col] == "M" && celdas[idx].classList.contains("celda-bandera")) {
-        cont++;
-        console.log("Cantidad de banderas bien colocadas: " + cont);
+      if(celdas[idx].classList.contains("celda-bandera")){
+        totalFlag++;
+        console.log("Cantidad de banderas en total: " + totalFlag);
+        if(tablero[nueva_fila][nueva_col] == "M")  {
+            flagsValid++;
+            console.log("Cantidad de banderas bien colocadas: " + flagsValid);
+        }
       }
     }
 
   });
-  if(cont == tablero[fila][col]){
-    //Realiza el revelado de todas las   celdas que no son minas. 
+  
+  if(totalFlag != tablero[fila][col]){
+    //Se considera un escenario de look-ahead inválido, por lo tanto no es castigable a revelar celdas.
+    //Mejora a futuro: Animación de celda oculta a celda vacia, para todas las celdas que no sean banderas.
+    // mientras el usuario presiona click.
+    console.log("Acorde Insuficiente o Excedente => No revelo");
+    return;
+  }
+  let jugadaValida = false;
+  if (flagsValid == tablero[fila][col]) {
+    console.log("Jugada valida");
+    jugadaValida = true;
+  }
+    //Realiza el revelado de todas las casillas adyacentes indistintamente.
     direcciones.forEach(([df,dc]) => {
         let nueva_fila = fila + df;
         let nueva_col = col + dc;
@@ -169,13 +184,23 @@ function resolveAdy(tablero, fila, col,celdas){
           //alert("La posicion seleccionada no es correcta.");
           return;
         }
+        if(jugadaValida){
+            if(tablero[nueva_fila][nueva_col] != "M"){
+                setBoard(tablero, nueva_fila, nueva_col);
+                //Se evita revelar celdas de mina en caso de hacer una colocación de banderas válida.
+            }
+            return;
+        }
         
-        if(tablero[nueva_fila][nueva_col] != "M" ){
+
+        if(tablero[nueva_fila][nueva_col] == "M"){
+            //Flujo de jugada no valida.
+            console.log("Flujo de jugada no valida.");
             setBoard(tablero, nueva_fila, nueva_col);
         }
     });
   }
-}
+
 
 function getCoordenadas(event){
     // Convierte el elemento que es una cadena a un numero de base 
@@ -184,4 +209,4 @@ function getCoordenadas(event){
     let col_click = idx % ORDENC;
     let fila_click = Math.floor(idx / ORDENC);
     return {fila_click, col_click};
-}
+} 

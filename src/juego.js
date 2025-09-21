@@ -1,7 +1,7 @@
 //Este código contiene el modelo lógico y el renderizado del juego
 let segundos = 0;
 let minutos = 0;
-let intervalo;
+let intervalo = null;
 //Definición de constantes básicas
 //Dimensión del tablero
 let juegoTerminado = false;
@@ -20,7 +20,16 @@ pintar(tablero);
 });
 
 
-document.querySelector("#reiniciar").addEventListener("click", reiniciarJuego);
+document.querySelector("#reiniciar").addEventListener("click", function () {
+    this.classList.add("activado"); // enciende el borde
+  reiniciarJuego(); // tu lógica original
+
+  setTimeout(() => {
+  document.querySelector("#reiniciar").classList.remove("activado");
+}, 200); // se apaga después de un cuarto de segundo
+});
+
+
 
 /*---------------------     FUNCIONES DE RENDERIZADO    ----------------------- */
 
@@ -42,6 +51,7 @@ function pintar(tablero) {
         celda.addEventListener("click", (event_IZQ) => {
             if (juegoTerminado) return; // Evita que se siga jugando después de ganar o perder
             if(minutos == 0 && segundos == 0){
+                console.log("arranca");
                 iniciarTimer();
             }
             
@@ -86,6 +96,7 @@ function pintar(tablero) {
     //EVENTOS: CLICK DERECHO
     celda.addEventListener("contextmenu", function (event_D) {
         event_D.preventDefault(); // Evita que se abra el menú del navegador
+        if (juegoTerminado) return; // Evita que se siga jugando después de ganar o perder
         let {fila_click, col_click } = getCoordenadas(event_D);
         // Si la celda ya tiene bandera, la quitamos
         if (celda.classList.contains("celda-bandera")) {
@@ -102,6 +113,7 @@ function pintar(tablero) {
     cuadro.appendChild(celda);
   }
   console.log("Generando tablero...");
+  console.log(tablero);
   return celdas;
 }
 
@@ -115,14 +127,27 @@ function mapeoDOM(celdas, tablero) {
       const celda = celdas[indice1D];
       const valor = tablero[i][j];
 
-      celda.classList.remove("celda-oculta","celda-1","celda-2","celda-3","celda-4","celda-mina","celda-vacia");
+    if(celda.classList.contains("celda-bandera") && (tablero[i][j] >="1" && tablero[i][j] <= "5" )){
+        celda.classList.remove("celda-bandera");
+    }
+    if (juegoTerminado) {
+        if (celda.classList.contains("celda-bandera") && tablero[i][j] != "X") {
+            //Renderizo las banderas con tonos rojo.
+            celda.classList.remove("celda-bandera");
+            celda.classList.add("celda-bandera-error");
+            console.log("Celda encontrada roja")
+        }
+    }
+      celda.classList.remove("celda-oculta","celda-1","celda-2","celda-3","celda-4","celda-5","celda-mina","celda-vacia");
 
+      
       //Pongo la clase según el estado del tablero lógico:
       switch(valor){
         case '1': celda.classList.add("celda","celda-1"); break;
         case '2': celda.classList.add("celda","celda-2"); break;
         case '3': celda.classList.add("celda","celda-3"); break;
         case '4': celda.classList.add("celda","celda-4"); break;
+        case '5': celda.classList.add("celda","celda-5"); break;
         case 'X': celda.classList.add("celda","celda-mina"); break;
         case 'B': celda.classList.add("celda","celda-vacia"); break;
         default: celda.classList.add("celda","celda-oculta"); break;
@@ -132,6 +157,7 @@ function mapeoDOM(celdas, tablero) {
   if (juegoTerminado == true) {
     //terminar timer:
     detenerTimer();
+
     setTimeout(() => {
       alert("Has perdido ;(");
     }, 50);
@@ -145,6 +171,7 @@ function reiniciarJuego() {
   tablero = generarTablero(ORDENC,ORDENC,minas); // lógica que crea el tablero vacío o con minas
   reiniciarTimer();
   pintar(tablero); // repinta el DOM desde cero
+  
   
   //document.querySelector(".mensaje").textContent = ""; // limpia mensajes, en caso de existir etiquetas html
 }
