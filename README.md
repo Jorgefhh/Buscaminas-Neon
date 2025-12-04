@@ -29,6 +29,5 @@ Este proyecto combina algoritmos lógicos con renderizado dinámico en el DOM pa
 
 ## 📌 Mejoras futuras
 - Niveles de dificultad (fácil, medio, difícil)  
-- Diseño responsive para móviles  
-- Sonidos y animaciones adicionales  
+- Inclusión de una base de datos para puntajes.
 
