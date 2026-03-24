@@ -122,7 +122,7 @@ function pintar() {
                     alert("Ganaste");
                     // Enviar estadísticas al backend SOLO cuando gana
                     if (typeof enviarStats === 'function') {  //verifica que api.js fue cargada
-                        enviarStats();
+                        enviarStats(1);
                     }
                 }, 50);
                 return;
