@@ -49,41 +49,39 @@ function shuffle(array) {
 
 
 // ------------------       LÓGICA PRINCIPAL DEL JUEGO      ----------------------//
-function setBoard(tablero, fila, col) {
+function setBoard(fila, col) {
   //Ambos son filas
   //Uso las constantes anteriores.
   if (!(fila >= 0 && fila < ORDENF) || !(col >= 0 && col < ORDENF)) {
     //Si me salgo de los límites
-    //alert("La posicion seleccionada no es correcta.");
     return;
   }
   //Escenario: CLICK EN MINA => PIERDE
-  if (tablero[fila][col] == "M") {
+  if (juego.tablero[fila][col] == "M") {
     for(let i = 0; i < ORDENC; i++){
         for(let j = 0; j < ORDENC; j++){
-            if(tablero[i][j] == "M"){
-                tablero[i][j] = "X";
+            if(juego.tablero[i][j] == "M"){
+                juego.tablero[i][j] = "X";
             }
         }
     }
-    juegoTerminado = true;
+    juego.estado = "perdido";
     return;
   }
-  if (tablero[fila][col] != "V") return; // ya revelada, corto
+  if (juego.tablero[fila][col] != "V") return; // ya revelada, corto
 
   
   //A PARTIR DE AQUÍ SOLO QUEDAN CELDAS 'V' NO REVELADAS QUE NO TIENEN MINAS
-  contador++;
-  console.log("Celdas acertadas: " + contador);
+  juego.contador++;
 
-  let minasAdy = adyacencia(tablero, fila, col);
+  let minasAdy = adyacencia(fila, col);
 
   if (minasAdy > 0) {
     //Ponemos lógicamente en el tablero el numero correspondiente:
-    tablero[fila][col] = minasAdy + "";
+    juego.tablero[fila][col] = minasAdy + "";
     return;
   } else {
-    tablero[fila][col] = "B";
+    juego.tablero[fila][col] = "B";
 
     //PROPAGO RECURSIVAMENTE HACIA TODOS SUS LADOS ADYACENTES:
 
@@ -96,7 +94,7 @@ function setBoard(tablero, fila, col) {
 
     //Mediante el for each hago 8 llamadas recursivas:
     direcciones.forEach(([df, dc]) => {
-      setBoard(tablero, fila + df, col + dc);
+      setBoard(fila + df, col + dc);
     });
   }
 
@@ -104,7 +102,7 @@ function setBoard(tablero, fila, col) {
 }
 
 
-function adyacencia(tablero, fila, col) {
+function adyacencia(fila, col) {
   const direcciones = [
     [-1, -1],
     [-1, 0],
@@ -120,9 +118,9 @@ function adyacencia(tablero, fila, col) {
     let nueva_fila = fila + df;
     let nueva_col = col + dc;
     //Validación de bordes:
-    if ( nueva_fila >= 0 && nueva_fila < tablero.length && nueva_col >= 0 && nueva_col < tablero.length) {
+    if ( nueva_fila >= 0 && nueva_fila < juego.tablero.length && nueva_col >= 0 && nueva_col < juego.tablero.length) {
       //Busco si hay minas alrededor:
-      if (tablero[nueva_fila][nueva_col] === "M") {
+      if (juego.tablero[nueva_fila][nueva_col] === "M") {
         cont++;
       }
     }
@@ -131,7 +129,7 @@ function adyacencia(tablero, fila, col) {
 }
 
 
-function resolveAdy(tablero, fila, col,celdas){
+function resolveAdy(fila, col){
     //Se fija en cada celda adyacente para ver la cantidad de banderas
     const direcciones = [
     [-1, -1],
@@ -151,28 +149,22 @@ function resolveAdy(tablero, fila, col,celdas){
     if (nueva_fila >= 0 && nueva_fila < ORDENF && nueva_col >= 0 && nueva_col < ORDENF) {
       let idx = ORDENC * nueva_fila + nueva_col;
       //Validación de bordes:
-      if(celdas[idx].classList.contains("celda-bandera")){
+      if(juego.celdas[idx].classList.contains("celda-bandera")){
         totalFlag++;
-        console.log("Cantidad de banderas en total: " + totalFlag);
-        if(tablero[nueva_fila][nueva_col] == "M")  {
+        if(juego.tablero[nueva_fila][nueva_col] == "M")  {
             flagsValid++;
-            console.log("Cantidad de banderas bien colocadas: " + flagsValid);
         }
       }
     }
 
   });
   
-  if(totalFlag != tablero[fila][col]){
+  if(totalFlag != juego.tablero[fila][col]){
     //Se considera un escenario de look-ahead inválido, por lo tanto no es castigable a revelar celdas.
-    //Mejora a futuro: Animación de celda oculta a celda vacia, para todas las celdas que no sean banderas.
-    // mientras el usuario presiona click.
-    console.log("Acorde Insuficiente o Excedente => No revelo");
     return;
   }
   let jugadaValida = false;
-  if (flagsValid == tablero[fila][col]) {
-    console.log("Jugada valida");
+  if (flagsValid == juego.tablero[fila][col]) {
     jugadaValida = true;
   }
     //Realiza el revelado de todas las casillas adyacentes indistintamente.
@@ -181,22 +173,20 @@ function resolveAdy(tablero, fila, col,celdas){
         let nueva_col = col + dc;
         if (!(nueva_fila >= 0 && nueva_fila < ORDENF) || !(nueva_col >= 0 && nueva_col < ORDENF)) {
           //Si me salgo de los límites
-          //alert("La posicion seleccionada no es correcta.");
           return;
         }
         if(jugadaValida){
-            if(tablero[nueva_fila][nueva_col] != "M"){
-                setBoard(tablero, nueva_fila, nueva_col);
+            if(juego.tablero[nueva_fila][nueva_col] != "M"){
+                setBoard(nueva_fila, nueva_col);
                 //Se evita revelar celdas de mina en caso de hacer una colocación de banderas válida.
             }
             return;
         }
         
 
-        if(tablero[nueva_fila][nueva_col] == "M"){
+        if(juego.tablero[nueva_fila][nueva_col] == "M"){
             //Flujo de jugada no valida.
-            console.log("Flujo de jugada no valida.");
-            setBoard(tablero, nueva_fila, nueva_col);
+            setBoard(nueva_fila, nueva_col);
         }
     });
   }
