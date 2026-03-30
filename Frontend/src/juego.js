@@ -11,11 +11,15 @@ const juego = {
   celdas: [],
   contador: 0,
   minas: 10,
+  minasRestantes: 10,
   intervalo: null,
   minutos: 0,
   segundos: 0,
   clicksIzquierdo: 0,
   clicksDerecho: 0,
+  modoId: 1,
+  fechaUltimaPartida: "-",
+  expGanada: 0,
   
   // Métodos útiles
   haTerminado() {
@@ -34,12 +38,36 @@ const juego = {
     this.segundos = 0;
     this.clicksIzquierdo = 0;
     this.clicksDerecho = 0;
+    this.minasRestantes = this.minas;
+    this.expGanada = 0;
+    this.fechaUltimaPartida = "-";
     this.tablero = generarTablero(ORDENF, ORDENC, this.minas);
-    this.actualizarContadoresUI();
+    this.actualizarEstadisticasUI();
+    // Ocultar panel al reiniciar
+    const panel = document.querySelector(".panel-estadisticas");
+    if (panel) {
+      panel.classList.remove("visible");
+    }
   },
-  actualizarContadoresUI() {
-    document.getElementById("clicks-izq").textContent = this.clicksIzquierdo;
-    document.getElementById("clicks-der").textContent = this.clicksDerecho;
+  actualizarEstadisticasUI() {
+    const tiempoFormato = `${String(this.minutos).padStart(2, '0')}:${String(this.segundos).padStart(2, '0')}`;
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    };
+
+    setText("tiempo", tiempoFormato);
+    setText("estad-tiempo", tiempoFormato);
+    setText("estad-clicks-izq", this.clicksIzquierdo);
+    setText("estad-clicks-der", this.clicksDerecho);
+    setText("estad-modo", this.modoId);
+    setText("estad-fecha", this.fechaUltimaPartida);
+    setText("estad-exp", this.expGanada);
+    setText("bombas-restantes", this.minasRestantes);
+    const panel = document.querySelector(".panel-estadisticas");
+    if (panel) {
+      panel.classList.toggle("visible", this.haTerminado());
+    }
   }
 };
 
@@ -84,7 +112,7 @@ function pintar() {
         celda.addEventListener("click", (event_IZQ) => {
             if (juego.haTerminado()) return; // Evita que se siga jugando después de ganar o perder
             juego.clicksIzquierdo++; // Incrementar contador de clicks izquierdo
-            juego.actualizarContadoresUI(); // Actualizar UI
+            juego.actualizarEstadisticasUI(); // Actualizar UI
             
             if(juego.minutos == 0 && juego.segundos == 0){
                 iniciarTimer();
@@ -118,6 +146,9 @@ function pintar() {
             if (juego.contador == ORDENC * ORDENF - juego.minas) {
                 detenerTimer();
                 juego.estado = "ganado";
+                juego.fechaUltimaPartida = new Date().toLocaleString();
+                juego.expGanada = calcularExp(juego);
+                juego.actualizarEstadisticasUI();
                 setTimeout(() => {
                     alert("Ganaste");
                     // Enviar estadísticas al backend SOLO cuando gana
@@ -130,6 +161,9 @@ function pintar() {
             
             if (juego.haPerdido()) {
                 detenerTimer();
+                juego.fechaUltimaPartida = new Date().toLocaleString();
+                juego.expGanada = calcularExp(juego); // o puedes dejar 0 para perdida
+                juego.actualizarEstadisticasUI();
                 setTimeout(() => {
                     alert("Has perdido >:(");
                     // NO enviar estadísticas cuando pierde
@@ -143,19 +177,26 @@ function pintar() {
         event_D.preventDefault(); // Evita que se abra el menú del navegador
         if (juego.haTerminado()) return; // Evita que se siga jugando después de ganar o perder
         juego.clicksDerecho++; // Incrementar contador de clicks derecho
-        juego.actualizarContadoresUI(); // Actualizar UI
         
         let {fila_click, col_click } = getCoordenadas(event_D);
         // Si la celda ya tiene bandera, la quitamos
         if (celda.classList.contains("celda-bandera")) {
             celda.classList.remove("celda-bandera");
             celda.classList.add("celda-oculta");
+            if (juego.minasRestantes < juego.minas) {
+                juego.minasRestantes++;
+            }
         } else {
-            if(juego.tablero[fila_click][col_click] == "M" || juego.tablero[fila_click][col_click] == "V"){
+            if (juego.tablero[fila_click][col_click] == "M" || juego.tablero[fila_click][col_click] == "V") {
                 celda.classList.remove("celda-oculta");
                 celda.classList.add("celda-bandera");
+                if (juego.minasRestantes > 0) {
+                    juego.minasRestantes--;
+                }
             }
         }
+
+        juego.actualizarEstadisticasUI(); // Actualizar UI
     });
     //Renderizado
     cuadro.appendChild(celda);
@@ -216,8 +257,7 @@ function iniciarTimer() {
       juego.minutos++;
       juego.segundos = 0;
     }
-    document.getElementById("tiempo").textContent =
-      `${juego.minutos.toString().padStart(2, '0')}:${juego.segundos.toString().padStart(2, '0')}`;
+    juego.actualizarEstadisticasUI();
   }, 1000);
 }
 
