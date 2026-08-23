@@ -23,8 +23,9 @@ public class PartidaController {
     }
 
     @PostMapping()
-    public ResponseEntity<Partida> crearPartida(@RequestBody Partida partida){
-        //Invoco al service
+    //Se ejecuta una serie de operaciones que utilizan como parámetros el body del datagrama http request, el cual contiene los datos.
+    public ResponseEntity<Partida> crearPartida(@RequestBody Partida partida){  //Aquí se deserializa el body a un objeto POJO  
+        //Invoco al service para que haga la lógica de negocio.
         Partida nueva = partidaService.registrarPartida(partida);
         return ResponseEntity.ok(nueva);
     }

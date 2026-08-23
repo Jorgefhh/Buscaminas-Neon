@@ -9,7 +9,7 @@ import backend.repository.PartidaRepository;
 public class PartidaService {
     private final PartidaRepository partidaRepository;
 
-    //Constructor inicializado:
+    //Constructor inicializado: A su vez usa un objeto repositorio que es creado automaticamente por spring mediante ioc
     public PartidaService(PartidaRepository partidaRepository){
         this.partidaRepository = partidaRepository;
     }

@@ -112,7 +112,7 @@ function pintar() {
         celda.addEventListener("click", (event_IZQ) => {
             if (juego.haTerminado()) return; // Evita que se siga jugando después de ganar o perder
             juego.clicksIzquierdo++; // Incrementar contador de clicks izquierdo
-            juego.actualizarEstadisticasUI(); // Actualizar UI
+            juego.actualizarEstadisticasUI(); // Actualizar UI, 
             
             if(juego.minutos == 0 && juego.segundos == 0){
                 iniciarTimer();
@@ -153,7 +153,7 @@ function pintar() {
                     alert("Ganaste");
                     // Enviar estadísticas al backend SOLO cuando gana
                     if (typeof enviarStats === 'function') {  //verifica que api.js fue cargada
-                        enviarStats(1);
+                        enviarStats(1);    // esto envía finalmente el contenido a la función que armará el paquete post
                     }
                 }, 50);
                 return;

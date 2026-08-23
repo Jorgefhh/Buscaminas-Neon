@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minesweeper Neon | Nueva partida</title>
+  <link rel="stylesheet" href="menu.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="menu.html" aria-label="Minesweeper Neon, partida">Minesweeper <span>Neon</span></a>
+    <a class="guest-login" id="guest-login" href="../auth/login.html">
+      <span>¿No tenés cuenta?</span>
+      <strong>Iniciá sesión</strong>
+    </a>
+    <div class="account-preview" id="account-preview" aria-label="Perfil de usuario">
+      <div class="avatar" aria-hidden="true"><span class="avatar-head"></span><span class="avatar-body"></span></div>
+      <div class="account-data"><strong id="username">Jorginho</strong><div class="xp-row"><span>XP</span><span class="xp-track"><span id="xp-progress"></span></span><small id="xp-value">120</small></div></div>
+    </div>
+    <button class="settings-button" type="button" aria-label="Configuración" title="Configuración"><span aria-hidden="true">⚙</span></button>
+  </header>
+  <nav class="main-nav" aria-label="Navegación principal">
+    <a class="active" href="menu.html" aria-current="page">Partida</a>
+    <a href="perfil.html">Perfil</a><a href="clasificacion.html">Clasificación</a><a href="partidas_guardadas.html">Partidas Guardadas</a>
+  </nav>
+  <main class="page-content"><section class="new-game-panel" aria-labelledby="new-game-title"><div class="modal">
+    <h1 id="new-game-title">Nueva Partida</h1><div class="divider"></div><h2 class="section-label">Tamaño del Tablero</h2>
+    <div class="difficulty-track" id="difficulty-track">
+      <button class="diff-card selected" type="button" data-index="0" aria-pressed="true"><span class="diff-name">Fácil</span><span class="diff-value">9×9</span></button>
+      <button class="diff-card" type="button" data-index="1" aria-pressed="false"><span class="diff-name">Intermedio</span><span class="diff-value">16×16</span></button>
+      <button class="diff-card" type="button" data-index="2" aria-pressed="false"><span class="diff-name">Avanzado</span><span class="diff-value">16×30</span></button>
+      <button class="diff-card" type="button" data-index="3" aria-pressed="false"><span class="diff-name">Experto</span><span class="diff-value">20×30</span></button>
+    </div>
+    <p class="note">Nota: Las partidas jugadas solo serán guardadas si se presiona en el botón <strong>"Guardar"</strong> al finalizarla ó si el jugador logra un nuevo récord personal</p>
+    <button class="start-button" id="start-button" type="button">Empezar</button>
+  </div></section></main>
+  <script src="menu.js"></script>
+</body>
+</html>

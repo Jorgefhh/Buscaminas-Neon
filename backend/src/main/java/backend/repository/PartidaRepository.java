@@ -7,13 +7,16 @@ import backend.model.Partida;
 
 @Repository
 public class PartidaRepository {
-    private final JdbcTemplate jdbcTemplate;
+    //Utilizamos jdbc template para generar las consultas de manera manual teniendo menos abstracción y más control sobre la BD
+    private final JdbcTemplate jdbcTemplate;  
 
     public PartidaRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     //Operaciones:
+    //Estas son las operaciones de la base de datos:
+    
 
     public int save(Partida p) {
         return jdbcTemplate.update(
@@ -24,7 +27,7 @@ public class PartidaRepository {
         p.getExpGanada(),
         p.getFechaPartida(),
         p.getIdModo(),
-        p.getUsuarioId()
+        p.getUsuarioId()  //Cómo se el id del usuario que generó esto en primer lugar ?
     );
     }
 

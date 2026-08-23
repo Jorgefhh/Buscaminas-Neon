@@ -1,73 +1,74 @@
-//En esta sección de código lo que voy a hacer es pasar los objetos a través
-//del protocolo http para que un backend pueda procesarlos y hacer su respectiva lógica de negocio 
+// ============================================
+// api.js
+// Acá van TODAS las funciones que hacen fetch al backend.
+// La idea es que login.html, registrar.html, juego.js, etc,
+// llamen a estas funciones en vez de escribir fetch() por todos lados.
+// ============================================
 
-function enviarBackend() {
-    // Verificar que el objeto juego esté disponible
-    if (typeof juego === 'undefined') {
-        console.error("Error: El objeto 'juego' no está disponible");
-        return;
-    }
+// Cambiá esto si tu backend corre en otro puerto o dominio.
+const API_BASE_URL = "http://localhost:8080";
 
-    // Serializo el JSON
-    const datosJson = JSON.stringify(juego);
+// ---------- REGISTRO ----------
+// datosUsuario = {
+//   nombreUsuarios, correo, password, foto, fechaInicio, experiencia
+// }
+async function registrarUsuario(datosUsuario) {
+  const respuesta = await fetch(`${API_BASE_URL}/usuarios/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(datosUsuario),
+  });
 
-    // Inicio la petición HTTP mediante un fetch
-    fetch("http://localhost:8080/api/partidas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: datosJson 
-    })
-    .then(res => res.json())  // Este es quien recibe el eventual HTTP response del servidor.
-    .then(data => console.log("Respuesta del backend:", data))  // Procesa el objeto
-    .catch(err => console.error("Error:", err)); // Captura el error si es que hubo
+  if (!respuesta.ok) {
+    const textoError = await respuesta.text();
+    throw new Error(textoError || "No se pudo registrar el usuario");
+  }
+
+  // Algunos backends no devuelven body en el registro, por eso el catch
+  return respuesta.json().catch(() => ({}));
 }
 
-// Enviar solo los datos necesarios para la tabla Partidas
-function enviarPartidaAlBackend(modoId = null) {
-    if (typeof juego === 'undefined') {
-        console.error("Error: El objeto 'juego' no está disponible");
-        return;
-    }
+// ---------- LOGIN ----------
+ //credenciales = { correo, password }
+// El backend debería devolver algo como { token: "..." }
+async function loginUsuario(credenciales) {
+  const respuesta = await fetch(`${API_BASE_URL}/usuarios/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credenciales),
+  });
 
-    // Construir el objeto partida
-    const partida = {
-        tiempo: (juego.minutos * 60 + juego.segundos).toFixed(2),
-        click_izq: juego.clicksIzquierdo,
-        click_der: juego.clicksDerecho,
-        exp_ganada: calcularExp(juego), // o un valor fijo
-        fecha_partida: new Date().toISOString(),
-        Gamemode_idModo: modoId, // Solo si el usuario elige el modo explícitamente (el backend puede asignar un valor por defecto)
-        Usuarios_idUsuarios: 1   // el id del usuario que jugó
-    };
+  if (!respuesta.ok) {
+    const textoError = await respuesta.text();
+    throw new Error(textoError || "Usuario o contraseña incorrectos");
+  }
 
-    fetch("http://localhost:8080/api/partidas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(partida)
-    })
-    .then(res => res.json())
-    .then(data => console.log("Respuesta del backend:", data))
-    .catch(err => console.error("Error:", err));
+  return respuesta.json();
 }
 
-// Esta función la usé para enviar datos cuando el jugador GANA el juego
-function enviarStats(modoId = 1) {
-    if (typeof juego === 'undefined') {
-        console.error("Error: El objeto 'juego' no está disponible");
-        return;
-    }
-    if (juego.haGanado()) {
-        enviarPartidaAlBackend(modoId);
-    }
-}
+// ---------- Función de ayuda para pedidos que necesitan el token ----------
+// Ejemplo de uso más adelante: fetchConToken("/usuario/datos")
+async function fetchConToken(ruta, opciones = {}) {
+  const token = localStorage.getItem("token");
 
-// Función para enviar datos manualmente (por ejemplo, con un botón)
-function enviarDatosManualmente() {
-    enviarBackend();
-}
+  const respuesta = await fetch(`${API_BASE_URL}${ruta}`, {
+    ...opciones,
+    headers: {
+      ...(opciones.headers || {}),
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
+  if (respuesta.status === 401) {
+    // Si el token venció o es inválido -> mandamos al usuario a loguearse de nuevo
+    localStorage.removeItem("token");
+    window.location.href = "/src/auth/login.html";
+    return;
+  }
 
-function calcularExp(juego) {
-    // lógica simple: cada click suma 10 puntos
-    return (juego.clicksIzquierdo + juego.clicksDerecho) * 10;
+  return respuesta;
 }
